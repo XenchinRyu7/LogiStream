@@ -172,7 +172,7 @@ export class AppComponent implements OnInit, OnDestroy {
   // Map Initialization
   private initMap() {
     // AWS charcoal-grey/dark tile layer
-    const darkTileLayer = L.tileLayer('https://{s}.tile.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    const darkTileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
       maxZoom: 19,
       attribution: '© OpenStreetMap contributors, CartoDB'
     });
