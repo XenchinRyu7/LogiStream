@@ -1,164 +1,222 @@
-<div class="main-container" style="display: flex; flex-direction: column; height: 100vh; padding: 16px; gap: 16px;">
+<div style="display: flex; flex-direction: column; height: 100vh; padding: 20px; gap: 20px; max-width: 1600px; margin: 0 auto; width: 100%;">
   
-  <!-- Dashboard Header & Top Stats -->
-  <header style="display: flex; justify-content: space-between; align-items: center; padding: 8px 16px;" class="glass-panel">
-    <div style="display: flex; align-items: center; gap: 12px;">
-      <div style="width: 12px; height: 12px; border-radius: 50%; background: #38bdf8; box-shadow: 0 0 10px #38bdf8;"></div>
-      <h1 style="font-size: 1.5rem; font-weight: 700; letter-spacing: -0.5px;">LogiStream <span style="font-weight: 300; font-size: 1.1rem; color: var(--text-secondary);">Control Tower</span></h1>
+  <!-- Dashboard Header Console -->
+  <header style="display: flex; justify-content: space-between; align-items: center; padding: 16px 24px;" class="glass-panel">
+    <div style="display: flex; align-items: center; gap: 16px;">
+      <!-- Pulsing radar icon -->
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#0ea5e9" width="32" height="32" style="filter: drop-shadow(0 0 8px rgba(14, 165, 233, 0.5));">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+      </svg>
+      <div>
+        <h1 style="font-size: 1.4rem; font-weight: 800; letter-spacing: -0.5px; background: linear-gradient(to right, #0ea5e9, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+          LOGISTREAM HUB
+        </h1>
+        <p style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 500;">Intelligent Supply Chain & Telemetry Control Tower</p>
+      </div>
     </div>
     
-    <!-- Connection Statuses -->
-    <div style="display: flex; gap: 20px; align-items: center; font-size: 0.85rem;">
-      <div style="display: flex; align-items: center; gap: 6px;">
-        <span style="color: var(--text-secondary);">WebSocket Status:</span>
-        <span [style.color]="wsConnected ? '#10b981' : '#ef4444'" style="font-weight: 600; display: flex; align-items: center; gap: 4px;">
-          <span [style.background-color]="wsConnected ? '#10b981' : '#ef4444'" style="width: 8px; height: 8px; border-radius: 50%; display: inline-block;"></span>
-          {{ wsConnected ? 'CONNECTED' : 'DISCONNECTED' }}
-        </span>
+    <!-- Real-time metrics in header -->
+    <div style="display: flex; gap: 24px; align-items: center; font-size: 0.85rem;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span style="width: 8px; height: 8px; border-radius: 50%;" [style.background-color]="wsConnected ? '#10b981' : '#f43f5e'" [style.box-shadow]="wsConnected ? '0 0 8px #10b981' : '0 0 8px #f43f5e'"></span>
+        <span style="color: var(--text-secondary); font-weight: 600;">{{ wsConnected ? 'WS CONNECTED' : 'WS OFFLINE' }}</span>
       </div>
       
-      <div style="display: flex; align-items: center; gap: 6px;">
-        <span style="color: var(--text-secondary);">Active Sessions (Redis):</span>
-        <span style="color: #38bdf8; font-weight: 700;">{{ activeSessions }}</span>
+      <div style="height: 24px; width: 1px; background: rgba(255,255,255,0.08);"></div>
+      
+      <div style="display: flex; flex-direction: column; align-items: flex-end;">
+        <span style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Active Sessions</span>
+        <span style="color: #0ea5e9; font-weight: 800; font-size: 0.95rem;">{{ activeSessions }} <span style="font-size: 0.7rem; color: var(--text-secondary); font-weight: 400;">clients</span></span>
       </div>
 
-      <div style="display: flex; align-items: center; gap: 6px;">
-        <span style="color: var(--text-secondary);">System Load:</span>
-        <span class="badge-virtual-thread" style="padding: 2px 6px; border-radius: 4px;">Virtual Threads Enabled</span>
-      </div>
+      <div style="height: 24px; width: 1px; background: rgba(255,255,255,0.08);"></div>
+
+      <span class="badge-virtual-thread">ForkJoinPool-Loom</span>
     </div>
   </header>
 
-  <!-- Metrics Grid -->
-  <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
-    <div class="glass-panel" style="padding: 16px; display: flex; flex-direction: column; gap: 4px;">
-      <span style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">Raw Telemetry Stream</span>
-      <span style="font-size: 1.75rem; font-weight: 800; color: #f8fafc;" class="text-glow-cyan">{{ rawTelemetryRate }}/s</span>
-      <span style="font-size: 0.7rem; color: var(--text-secondary);">Raw telemetry events sent to WebSocket broker</span>
+  <!-- Performance & Bandwidth Stats Grid -->
+  <div class="stat-grid">
+    <div class="glass-panel" style="padding: 16px; display: flex; align-items: center; gap: 16px;">
+      <div style="background: rgba(14, 165, 233, 0.1); padding: 12px; border-radius: 12px; border: 1px solid rgba(14, 165, 233, 0.2);">
+        <!-- Inbound stream icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#0ea5e9" width="24" height="24">
+          <path d="M16 17.01V10h-2v7.01h-3L15 21l4-3.99h-3zM9 3L5 6.99h3V14h2V6.99h3L9 3z"/>
+        </svg>
+      </div>
+      <div>
+        <span style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 700;">Inbound WebSockets</span>
+        <h2 style="font-size: 1.5rem; font-weight: 800; color: #f3f4f6;">{{ rawTelemetryRate }} <span style="font-size: 0.8rem; font-weight: 500; color: var(--text-secondary);">req/s</span></h2>
+      </div>
     </div>
     
-    <div class="glass-panel" style="padding: 16px; display: flex; flex-direction: column; gap: 4px;">
-      <span style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">RxJS Throttled Stream</span>
-      <span style="font-size: 1.75rem; font-weight: 800; color: #10b981;" class="text-glow-green">{{ throttledTelemetryRate }}/s</span>
-      <span style="font-size: 0.7rem; color: #10b981; font-weight: 600;">Saved: {{ calculateBandwidthSaving() }}% DOM Renders</span>
+    <div class="glass-panel" style="padding: 16px; display: flex; align-items: center; gap: 16px;">
+      <div style="background: rgba(16, 185, 129, 0.1); padding: 12px; border-radius: 12px; border: 1px solid rgba(16, 185, 129, 0.2);">
+        <!-- Throttled speed icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#10b981" width="24" height="24">
+          <path d="M20.38 8.57l-1.23 1.85a8 8 0 0 1-.22 7.58H5.07A8 8 0 0 1 12 6a7.92 7.92 0 0 1 6.27 3.07l1.41-1.41A9.93 9.93 0 0 0 12 4a10 10 0 0 0-7.75 16.3h15.5A10 10 0 0 0 20.38 8.57zM10.85 12.14a2 2 0 0 1 2.23-.27l4.02-4.02-1.41-1.41-4.02 4.02a2 2 0 0 1-.82 1.68z"/>
+        </svg>
+      </div>
+      <div>
+        <span style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 700;">RxJS Throttled Render</span>
+        <h2 style="font-size: 1.5rem; font-weight: 800; color: #10b981;">
+          {{ throttledTelemetryRate }} <span style="font-size: 0.8rem; font-weight: 500; color: var(--text-secondary);">fps</span>
+          <span style="font-size: 0.75rem; color: #10b981; margin-left: 8px; font-weight: 600;">(-{{ calculateBandwidthSaving() }}% Load)</span>
+        </h2>
+      </div>
     </div>
 
-    <div class="glass-panel" style="padding: 16px; display: flex; flex-direction: column; gap: 4px;">
-      <span style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">Monitored Vehicles</span>
-      <span style="font-size: 1.75rem; font-weight: 800; color: #a855f7;">{{ activeVehiclesCount }} <span style="font-size: 0.9rem; font-weight: 400; color: var(--text-secondary);">Active</span></span>
-      <span style="font-size: 0.7rem; color: var(--text-secondary);">Tracked via Redis In-Memory Hash</span>
+    <div class="glass-panel" style="padding: 16px; display: flex; align-items: center; gap: 16px;">
+      <div style="background: rgba(139, 92, 246, 0.1); padding: 12px; border-radius: 12px; border: 1px solid rgba(139, 92, 246, 0.2);">
+        <!-- Active trucks icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#8b5cf6" width="24" height="24">
+          <path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm12 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-7l2.25 3H17v-3h2.5z"/>
+        </svg>
+      </div>
+      <div>
+        <span style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 700;">Redis Cache Nodes</span>
+        <h2 style="font-size: 1.5rem; font-weight: 800; color: #a855f7;">{{ activeVehiclesCount }} <span style="font-size: 0.8rem; font-weight: 500; color: var(--text-secondary);">Active Trucks</span></h2>
+      </div>
     </div>
 
-    <div class="glass-panel" [class.alert-card-active]="activeAlarms.length > 0" style="padding: 16px; display: flex; flex-direction: column; gap: 4px; border: 1px solid var(--border-color);">
-      <span style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">Thermal Alerts</span>
-      <span style="font-size: 1.75rem; font-weight: 800;" [style.color]="activeAlarms.length > 0 ? '#ef4444' : '#10b981'">
-        {{ activeAlarms.length > 0 ? 'CRITICAL (' + activeAlarms.length + ')' : 'NORMAL' }}
-      </span>
-      <span style="font-size: 0.7rem; color: var(--text-secondary);">Temp Spikes > 5°C detected in Redis</span>
+    <div class="glass-panel" [class.alert-card-active]="activeAlarms.length > 0" style="padding: 16px; display: flex; align-items: center; gap: 16px;">
+      <div [style.background]="activeAlarms.length > 0 ? 'rgba(244, 63, 94, 0.15)' : 'rgba(16, 185, 129, 0.1)'" style="padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+        <!-- Temperature alert icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" [attr.fill]="activeAlarms.length > 0 ? '#f43f5e' : '#10b981'" width="24" height="24">
+          <path d="M12 2c-1.1 0-2 .9-2 2v7.28C9.13 11.8 8.5 12.83 8.5 14c0 1.93 1.57 3.5 3.5 3.5s3.5-1.57 3.5-3.5c0-1.17-.63-2.2-1.5-2.72V4c0-1.1-.9-2-2-2zm1 9h-2V4h2v7z"/>
+        </svg>
+      </div>
+      <div>
+        <span style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 700;">Sensor Diagnostics</span>
+        <h2 style="font-size: 1.5rem; font-weight: 800;" [style.color]="activeAlarms.length > 0 ? '#f43f5e' : '#10b981'">
+          {{ activeAlarms.length > 0 ? 'ANOMALY DETECTED' : 'SYSTEM HEALTHY' }}
+        </h2>
+      </div>
     </div>
   </div>
 
-  <!-- Main Content Grid: Map + Controller Panel -->
-  <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 16px; flex-grow: 1; min-height: 0;">
+  <!-- Main Workspace Grid: Map Control tower + Configuration Deck -->
+  <div class="dashboard-grid">
     
-    <!-- LEFT SIDE: Peta Map (Control tower visualization) -->
-    <div style="display: flex; flex-direction: column; gap: 12px; height: 100%;">
-      <div id="map" class="glass-panel" style="flex-grow: 1; min-height: 400px; border-radius: 12px;"></div>
-      
-      <!-- Alarm Ticker / Active alerts logs -->
-      <div class="glass-panel" style="padding: 12px; height: 120px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
-        <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Active Alarm Logs (WebSocket Telemetry)</span>
-        <div *ngIf="activeAlarms.length === 0" style="color: var(--text-secondary); font-size: 0.8rem; text-align: center; margin-top: 10px;">
-          No active telemetry anomalies. Cooling systems normal.
+    <!-- LEFT COLUMN: Live Telemetry Map Visualizer -->
+    <div style="display: flex; flex-direction: column; gap: 16px; height: 100%;">
+      <!-- Map card -->
+      <div style="flex-grow: 1; display: flex; flex-direction: column;" class="glass-panel">
+        <div style="padding: 16px 20px; border-bottom: 1px solid var(--panel-border); display: flex; justify-content: space-between; align-items: center;">
+          <h2 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
+            <span style="width: 6px; height: 6px; background: #0ea5e9; border-radius: 50%;"></span>
+            Live Geolocation Control Tower Map (OpenStreetMap)
+          </h2>
+          <span style="font-size: 0.7rem; color: var(--text-muted); font-weight: 600;">Updates: 250ms (RxJS Throttled)</span>
         </div>
-        <div *ngFor="let alarm of activeAlarms" style="background: rgba(239, 68, 68, 0.15); border-left: 4px solid #ef4444; padding: 6px 12px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; animation: pulse-ring 2s infinite alternate;">
-          <div style="font-size: 0.8rem;">
-            <strong style="color: #ef4444;">[VEHICLE ANOMALY]</strong> Vehicle <strong>{{ alarm.vehicleId }}</strong> reported high temp: <strong>{{ alarm.temperature }}°C</strong>
+        
+        <!-- Leaflet map injection -->
+        <div id="map" style="flex-grow: 1; border-radius: 0 0 16px 16px; min-height: 380px;"></div>
+      </div>
+      
+      <!-- Temperature Alarm list logs -->
+      <div class="glass-panel" style="padding: 16px; height: 130px; display: flex; flex-direction: column; gap: 10px;">
+        <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Active Diagnostics & Siren Alert Queue</span>
+        <div style="flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
+          <div *ngIf="activeAlarms.length === 0" style="color: var(--text-muted); font-size: 0.8rem; text-align: center; padding-top: 12px; font-weight: 500;">
+            No temperature alarms triggered. Cooling systems are holding state.
           </div>
-          <span style="font-size: 0.7rem; color: var(--text-secondary);">{{ alarm.timestamp | date:'HH:mm:ss' }}</span>
+          <div *ngFor="let alarm of activeAlarms" style="background: rgba(244, 63, 94, 0.08); border: 1px solid rgba(244, 63, 94, 0.2); border-left: 4px solid var(--danger); padding: 8px 16px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-size: 0.8rem; display: flex; align-items: center; gap: 8px;">
+              <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--danger); animation: flash-siren 0.5s infinite alternate;"></span>
+              <span>Vehicle <strong>{{ alarm.vehicleId }}</strong> container temperature exceeded safety limit: <strong style="color: var(--danger);">{{ alarm.temperature }}°C</strong> (Anomaly flagged in Redis)</span>
+            </div>
+            <span style="font-size: 0.75rem; color: var(--text-muted); font-family: monospace;">{{ alarm.timestamp | date:'HH:mm:ss' }}</span>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- RIGHT SIDE: Simulators & Database Logs -->
-    <div style="display: flex; flex-direction: column; gap: 16px; height: 100%; overflow-y: auto;">
+    <!-- RIGHT COLUMN: Simulator & Processors Controls -->
+    <div style="display: flex; flex-direction: column; gap: 20px; height: 100%; overflow-y: auto;">
       
-      <!-- Panel 1: Courier / IoT Telemetry Simulator Controls -->
-      <div class="glass-panel" style="padding: 16px; display: flex; flex-direction: column; gap: 12px;">
-        <h3 style="font-size: 1rem; font-weight: 700; border-bottom: 1px solid var(--border-color); padding-bottom: 6px; display: flex; justify-content: space-between;">
-          <span>Courier IoT Telemetry Simulator</span>
-          <span class="badge-virtual-thread" style="font-size: 0.7rem; padding: 1px 6px; border-radius: 4px;">Inbound Stream</span>
-        </h3>
+      <!-- Card 1: Telemetry Stream Simulator Controls -->
+      <div class="glass-panel" style="padding: 20px; display: flex; flex-direction: column; gap: 14px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--panel-border); padding-bottom: 10px;">
+          <h3 style="font-size: 0.9rem; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 6px;">
+            IoT Telemetry Simulator
+          </h3>
+          <span style="font-size: 0.65rem; background: rgba(14, 165, 233, 0.15); color: #0ea5e9; padding: 2px 6px; border-radius: 4px; font-weight: 700;">Inbound Engine</span>
+        </div>
         
-        <div style="display: flex; gap: 12px; align-items: center;">
+        <div style="display: flex; gap: 12px;">
           <button (click)="toggleTelemetrySimulator()" 
-                  [style.background]="simRunning ? '#ef4444' : '#10b981'"
-                  style="color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; flex-grow: 1; transition: background 0.2s;">
-            {{ simRunning ? 'STOP SIMULATOR' : 'START TELEMETRY SIMULATOR' }}
+                  [style.background]="simRunning ? 'var(--danger)' : 'var(--success)'"
+                  [style.box-shadow]="simRunning ? '0 0 10px var(--danger-glow)' : '0 0 10px var(--success-glow)'"
+                  style="color: white; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 700; cursor: pointer; flex-grow: 1; font-size: 0.8rem;">
+            {{ simRunning ? 'STOP TELEMETRY SIMULATOR' : 'START TELEMETRY SIMULATOR' }}
           </button>
           
           <button (click)="triggerTempAnomaly()" 
-                  [style.background]="tempAnomalyTriggered ? '#ef4444' : 'rgba(255,255,255,0.1)'"
-                  [style.color]="tempAnomalyTriggered ? 'white' : 'var(--text-primary)'"
-                  style="border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 6px; font-weight: 600; cursor: pointer; transition: all 0.2s;">
-            🔥 STRIKE OVERHEAT (TR-2)
+                  [style.background]="tempAnomalyTriggered ? 'rgba(244,63,94,0.2)' : 'rgba(255,255,255,0.03)'"
+                  [style.border-color]="tempAnomalyTriggered ? 'var(--danger)' : 'var(--panel-border)'"
+                  [style.color]="tempAnomalyTriggered ? 'var(--danger)' : 'var(--text-primary)'"
+                  style="border: 1px solid; padding: 10px; border-radius: 8px; font-weight: 700; cursor: pointer;">
+            ⚡ ANOMALY (TR-2)
           </button>
         </div>
         
-        <div style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4;">
-          Starts 3 simulated vehicles driving routes around Jakarta center, sending coordinate updates to the websocket STOMP engine on <code style="color: #38bdf8;">/app/telemetry</code> every 500ms.
-        </div>
+        <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4;">
+          Generates coordinate tracks for 3 courier trucks around Jakarta. Sends telemetry payloads to WebSocket engine on <code style="color: #0ea5e9; font-weight: bold;">/app/telemetry</code> every 500ms.
+        </p>
       </div>
 
-      <!-- Panel 2: Warehouse Sorting (Spring Statemachine + Virtual Threads) -->
-      <div class="glass-panel" style="padding: 16px; display: flex; flex-direction: column; gap: 12px; flex-grow: 1; min-height: 300px; display: flex; flex-direction: column;">
-        <h3 style="font-size: 1rem; font-weight: 700; border-bottom: 1px solid var(--border-color); padding-bottom: 6px; display: flex; justify-content: space-between;">
-          <span>Warehouse Batch Sorting Processor</span>
-          <span style="font-size: 0.7rem; background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); color: #6ee7b7; padding: 1px 6px; border-radius: 4px;">Virtual Threads</span>
-        </h3>
+      <!-- Card 2: State-Machine package sorting simulator -->
+      <div class="glass-panel" style="padding: 20px; display: flex; flex-direction: column; gap: 14px; flex-grow: 1; min-height: 300px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--panel-border); padding-bottom: 10px;">
+          <h3 style="font-size: 0.9rem; font-weight: 700; color: var(--text-primary);">
+            Warehouse State Transition Console
+          </h3>
+          <span style="font-size: 0.65rem; background: rgba(139, 92, 246, 0.15); color: #a78bfa; padding: 2px 6px; border-radius: 4px; font-weight: 700;">Project Loom</span>
+        </div>
         
-        <!-- Trigger Batch Simulation Form -->
-        <div style="display: flex; gap: 8px; align-items: center;">
-          <span style="font-size: 0.85rem; color: var(--text-secondary);">Batch Size:</span>
-          <input type="number" [(ngModel)]="simulationBatchSize" style="width: 60px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: white; padding: 6px; border-radius: 4px; text-align: center;" />
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <span style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 600;">Batch Size:</span>
+          <input type="number" [(ngModel)]="simulationBatchSize" style="width: 55px; background: rgba(0,0,0,0.3); border: 1px solid var(--panel-border); color: white; padding: 8px; border-radius: 6px; text-align: center; font-weight: bold; outline: none;" />
           
           <button (click)="runSortingSimulation()" 
-                  style="background: #a855f7; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-weight: 600; cursor: pointer; flex-grow: 1; transition: background 0.2s;">
+                  style="background: var(--secondary); color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 700; cursor: pointer; flex-grow: 1; font-size: 0.8rem; box-shadow: 0 0 10px rgba(139, 92, 246, 0.3);">
             SPAWN SORTING BATCH
           </button>
         </div>
 
-        <!-- Refresh button -->
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <span style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">Package Status Logs (PostgreSQL Data)</span>
-          <button (click)="loadPackages()" style="background: transparent; border: none; color: #38bdf8; font-size: 0.75rem; cursor: pointer; font-weight: 600;">
-            🔄 Refresh List
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px;">
+          <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Active Transitions (Postgres logs)</span>
+          <button (click)="loadPackages()" style="background: transparent; border: none; color: #0ea5e9; font-size: 0.75rem; cursor: pointer; font-weight: 700; padding: 0;">
+            🔄 Refresh Logs
           </button>
         </div>
 
-        <!-- Package list container -->
-        <div style="flex-grow: 1; overflow-y: auto; max-height: 250px; border: 1px solid var(--border-color); border-radius: 6px; background: rgba(0,0,0,0.2);">
-          <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.75rem;">
+        <!-- Packages scrollable table list -->
+        <div style="flex-grow: 1; overflow-y: auto; border: 1px solid var(--panel-border); border-radius: 8px; background: rgba(0,0,0,0.15); max-height: 300px;">
+          <table>
             <thead>
-              <tr style="background: rgba(255,255,255,0.03); border-bottom: 1px solid var(--border-color); color: var(--text-secondary);">
-                <th style="padding: 8px;">Package ID</th>
-                <th style="padding: 8px;">State (Machine)</th>
-                <th style="padding: 8px;">Worker Thread ID (Java Loom)</th>
+              <tr>
+                <th style="padding: 10px 12px; width: 30%;">Package ID</th>
+                <th style="padding: 10px 12px; width: 35%;">Lifecycle State</th>
+                <th style="padding: 10px 12px; width: 35%;">Java virtual thread</th>
               </tr>
             </thead>
             <tbody>
               <tr *ngIf="packages.length === 0">
-                <td colspan="3" style="padding: 16px; text-align: center; color: var(--text-secondary);">No packages processed. Click "Spawn Batch" to simulate high concurrency.</td>
+                <td colspan="3" style="padding: 24px; text-align: center; color: var(--text-muted); font-weight: 500;">
+                  No packages in system. Spawn a batch above to process via Loom Virtual Threads.
+                </td>
               </tr>
-              <tr *ngFor="let pkg of packages" style="border-bottom: 1px solid rgba(255,255,255,0.02); transition: background 0.2s; cursor: pointer;" hover="background: rgba(255,255,255,0.02)">
-                <td style="padding: 8px; font-weight: 600; color: #38bdf8;">{{ pkg.packageId }}</td>
-                <td style="padding: 8px;">
-                  <span [style.background-color]="getStateColor(pkg.state)" style="padding: 2px 6px; border-radius: 4px; font-weight: 600; font-size: 0.7rem; color: #000;">
+              <tr *ngFor="let pkg of packages">
+                <td style="padding: 10px 12px; font-weight: 700; color: #0ea5e9; font-family: monospace;">{{ pkg.packageId }}</td>
+                <td style="padding: 10px 12px;">
+                  <span [style.background-color]="getStateColor(pkg.state)" style="padding: 2px 8px; border-radius: 4px; font-weight: 700; font-size: 0.65rem; color: #000; letter-spacing: 0.02em;">
                     {{ pkg.state }}
                   </span>
                 </td>
-                <td style="padding: 8px;">
-                  <span class="badge-virtual-thread" style="padding: 1px 4px; border-radius: 3px; font-size: 0.7rem;">
+                <td style="padding: 10px 12px;">
+                  <span class="badge-virtual-thread" style="font-size: 0.65rem;">
                     {{ cleanThreadName(pkg.lastUpdatedByThread) }}
                   </span>
                 </td>
