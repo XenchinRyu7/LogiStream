@@ -171,7 +171,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   // Map Initialization
   private initMap() {
-    // Dark mode maps layer URL
+    // Premium charcoal/dark tiles (extremely subtle and minimalist)
     const darkTileLayer = L.tileLayer('https://{s}.tile.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
       maxZoom: 19,
       attribution: '© OpenStreetMap contributors, CartoDB'
@@ -183,17 +183,17 @@ export class AppComponent implements OnInit, OnDestroy {
       layers: [darkTileLayer]
     });
 
-    // Create glowing warehouse SVG marker for Central Hub
+    // Create minimalist SVG warehouse marker
     const hubIcon = L.divIcon({
       className: 'hub-marker-icon',
       html: this.getHubSvg(),
-      iconSize: [32, 32],
-      iconAnchor: [16, 16]
+      iconSize: [28, 28],
+      iconAnchor: [14, 14]
     });
 
     this.hubMarker = L.marker([this.HUB_LAT, this.HUB_LON], { icon: hubIcon })
       .addTo(this.map)
-      .bindPopup('<strong>Central Intelligent Logistics Hub</strong><br>Virtual Thread sorting engine running.');
+      .bindPopup('<strong>Central Logistics Hub</strong><br>Spring virtual threads processing center.');
   }
 
   // Update or render vehicle location on Leaflet Map
@@ -201,12 +201,12 @@ export class AppComponent implements OnInit, OnDestroy {
     this.activeVehicles.set(event.vehicleId, event);
     const hasAnomaly = this.activeAlarms.some(a => a.vehicleId === event.vehicleId);
     
-    // Custom DIV icon for the truck (using custom SVGs)
+    // Custom DIV icon for the truck (using custom clean SVGs)
     const icon = L.divIcon({
       className: 'vehicle-marker-icon',
       html: hasAnomaly ? this.getTruckSvgAnomaly(event.vehicleId) : this.getTruckSvgNormal(event.vehicleId),
-      iconSize: [36, 42],
-      iconAnchor: [18, 21]
+      iconSize: [32, 36],
+      iconAnchor: [16, 18]
     });
 
     if (this.vehicleMarkers.has(event.vehicleId)) {
@@ -217,9 +217,9 @@ export class AppComponent implements OnInit, OnDestroy {
       
       // Update popup content
       marker.getPopup()?.setContent(`
-        <strong style="color:#0ea5e9;">Vehicle ID: ${event.vehicleId}</strong><br>
+        <strong style="color:var(--primary);">Vehicle ID: ${event.vehicleId}</strong><br>
         Speed: ${event.speed.toFixed(1)} km/h<br>
-        Container Temp: <span style="font-weight:bold; color:${event.temperature > 5.0 ? '#f43f5e' : '#10b981'}">${event.temperature.toFixed(2)}°C</span>
+        Container Temp: <span style="font-weight:bold; color:${event.temperature > 5.0 ? 'var(--danger)' : 'var(--success)'}">${event.temperature.toFixed(2)}°C</span>
       `);
     } else {
       // Create new marker on map
@@ -234,11 +234,11 @@ export class AppComponent implements OnInit, OnDestroy {
   private drawRoutePath(routeEvent: RouteUpdateEvent) {
     const latLngs = routeEvent.routePoints.map(p => L.latLng(p.latitude, p.longitude));
     
-    // Choose specific color per truck
+    // Clean solid palette colors for route lines
     const colors: Record<string, string> = {
-      'TRUCK-1': '#0ea5e9', // Cyan
-      'TRUCK-2': '#8b5cf6', // Purple
-      'TRUCK-3': '#10b981'  // Green
+      'TRUCK-1': '#3b82f6', // SaaS Blue
+      'TRUCK-2': '#8b5cf6', // Indigo/Purple
+      'TRUCK-3': '#10b981'  // Emerald Green
     };
     
     const color = colors[routeEvent.vehicleId] || '#f59e0b';
@@ -251,9 +251,9 @@ export class AppComponent implements OnInit, OnDestroy {
       // Draw path
       const polyline = L.polyline(latLngs, {
         color: color,
-        weight: 3,
-        opacity: 0.75,
-        dashArray: '5, 10',
+        weight: 2,
+        opacity: 0.8,
+        dashArray: '4, 8',
         lineJoin: 'round'
       }).addTo(this.map);
       this.routeLines.set(routeEvent.vehicleId, polyline);
@@ -395,12 +395,12 @@ export class AppComponent implements OnInit, OnDestroy {
   // String helpers for templates
   getStateColor(state: string): string {
     switch (state) {
-      case 'MANIFESTED': return '#9ca3af'; // Grey
-      case 'HUB_SORTING': return '#f59e0b'; // Amber
-      case 'IN_TRANSIT': return '#0ea5e9'; // Sky Blue
-      case 'OUT_FOR_DELIVERY': return '#8b5cf6'; // Purple
-      case 'DELIVERED': return '#10b981'; // Green
-      default: return '#9ca3af';
+      case 'MANIFESTED': return 'rgba(255,255,255,0.15)'; // zinc border equivalent
+      case 'HUB_SORTING': return 'rgba(245, 158, 11, 0.25)'; // flat amber
+      case 'IN_TRANSIT': return 'rgba(59, 130, 246, 0.25)'; // flat blue
+      case 'OUT_FOR_DELIVERY': return 'rgba(139, 92, 246, 0.25)'; // flat purple
+      case 'DELIVERED': return 'rgba(16, 185, 129, 0.25)'; // flat emerald
+      default: return 'rgba(255,255,255,0.1)';
     }
   }
 
@@ -414,14 +414,13 @@ export class AppComponent implements OnInit, OnDestroy {
     return threadStr.length > 20 ? threadStr.substring(0, 20) + '...' : threadStr;
   }
 
-  // Custom SVGs generator for professional Leaflet rendering
+  // Clean flat SVGs for professional Leaflet rendering (without neon shadows)
   private getHubSvg(): string {
     return `
-      <div style="position: relative; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px;">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#0ea5e9" width="30" height="30" style="filter: drop-shadow(0 0 8px rgba(14, 165, 233, 0.65))">
+      <div style="position: relative; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; background: rgba(59, 130, 246, 0.15); border: 2px solid var(--primary); border-radius: 50%;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="var(--primary)" width="16" height="16">
           <path d="M12 2L2 7v13c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7L12 2zm0 3.3l7 3.5v9.2H5V8.8l7-3.5zm-3 7.7h2v4H9v-4zm4 0h2v4h-2v-4z"/>
         </svg>
-        <div style="position: absolute; width: 44px; height: 44px; border: 2px solid rgba(14, 165, 233, 0.4); border-radius: 50%; top:-6px; left:-6px; animation: pulse-ring 2s infinite; pointer-events: none;"></div>
       </div>
     `;
   }
@@ -429,11 +428,13 @@ export class AppComponent implements OnInit, OnDestroy {
   private getTruckSvgNormal(id: string): string {
     const displayId = id.replace('TRUCK-', 'TR-');
     return `
-      <div style="position: relative; display: flex; flex-direction: column; align-items: center; width: 36px;">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#10b981" width="28" height="28" style="filter: drop-shadow(0 0 6px rgba(16, 185, 129, 0.6))">
-          <path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm12 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-7l2.25 3H17v-3h2.5z"/>
-        </svg>
-        <span style="font-family: monospace; font-size: 8px; color: #fff; background: rgba(17, 24, 39, 0.85); padding: 1px 4px; border-radius: 4px; margin-top: -2px; border: 1px solid rgba(255,255,255,0.12); font-weight: bold; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">${displayId}</span>
+      <div style="position: relative; display: flex; flex-direction: column; align-items: center; width: 32px;">
+        <div style="display: flex; align-items: center; justify-content: center; width: 26px; height: 26px; background: rgba(16, 185, 129, 0.15); border: 1.5px solid var(--success); border-radius: 50%;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="var(--success)" width="15" height="15">
+            <path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm12 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-7l2.25 3H17v-3h2.5z"/>
+          </svg>
+        </div>
+        <span style="font-family: monospace; font-size: 8px; color: #fff; background: rgba(24, 24, 27, 0.9); padding: 1px 3px; border-radius: 3px; margin-top: 2px; border: 1px solid var(--panel-border); font-weight: bold;">${displayId}</span>
       </div>
     `;
   }
@@ -441,13 +442,15 @@ export class AppComponent implements OnInit, OnDestroy {
   private getTruckSvgAnomaly(id: string): string {
     const displayId = id.replace('TRUCK-', 'TR-');
     return `
-      <div style="position: relative; display: flex; flex-direction: column; align-items: center; width: 36px;">
-        <!-- Siren flashing circle -->
-        <div style="position: absolute; top:-6px; width: 10px; height: 10px; background: var(--danger); border-radius: 50%; border: 1.5px solid #fff; box-shadow: 0 0 12px var(--danger); animation: flash-siren 0.3s infinite alternate;"></div>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#f43f5e" width="30" height="30" style="filter: drop-shadow(0 0 8px rgba(244, 63, 94, 0.85))">
-          <path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm12 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-7l2.25 3H17v-3h2.5z"/>
-        </svg>
-        <span style="font-family: monospace; font-size: 8px; color: #fff; background: var(--danger); padding: 1px 4px; border-radius: 4px; margin-top: -2px; border: 1px solid #fff; font-weight: bold; text-shadow: 0 1px 2px rgba(0,0,0,0.5); box-shadow: 0 0 6px var(--danger-glow);">${displayId}</span>
+      <div style="position: relative; display: flex; flex-direction: column; align-items: center; width: 32px;">
+        <!-- Siren flat dot indicator -->
+        <div style="position: absolute; top:-3px; right:-3px; width: 8px; height: 8px; background: var(--danger); border-radius: 50%; border: 1px solid #fff; animation: siren-flash-flat 0.4s infinite alternate;"></div>
+        <div style="display: flex; align-items: center; justify-content: center; width: 26px; height: 26px; background: rgba(239, 68, 68, 0.15); border: 1.5px solid var(--danger); border-radius: 50%;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="var(--danger)" width="15" height="15">
+            <path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm12 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-7l2.25 3H17v-3h2.5z"/>
+          </svg>
+        </div>
+        <span style="font-family: monospace; font-size: 8px; color: #fff; background: var(--danger); padding: 1px 3px; border-radius: 3px; margin-top: 2px; border: 1px solid #fff; font-weight: bold; box-shadow: 0 0 4px rgba(239, 68, 68, 0.4);">${displayId}</span>
       </div>
     `;
   }

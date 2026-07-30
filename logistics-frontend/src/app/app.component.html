@@ -1,222 +1,226 @@
-<div style="display: flex; flex-direction: column; height: 100vh; padding: 20px; gap: 20px; max-width: 1600px; margin: 0 auto; width: 100%;">
+<div style="display: flex; flex-direction: column; height: 100vh; padding: 16px; gap: 16px; max-width: 1500px; margin: 0 auto; width: 100%;">
   
   <!-- Dashboard Header Console -->
-  <header style="display: flex; justify-content: space-between; align-items: center; padding: 16px 24px;" class="glass-panel">
-    <div style="display: flex; align-items: center; gap: 16px;">
-      <!-- Pulsing radar icon -->
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#0ea5e9" width="32" height="32" style="filter: drop-shadow(0 0 8px rgba(14, 165, 233, 0.5));">
-        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+  <header style="display: flex; justify-content: space-between; align-items: center; padding: 12px 20px;" class="glass-panel">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="28" height="28">
+        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
       </svg>
       <div>
-        <h1 style="font-size: 1.4rem; font-weight: 800; letter-spacing: -0.5px; background: linear-gradient(to right, #0ea5e9, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-          LOGISTREAM HUB
+        <h1 style="font-size: 1.15rem; font-weight: 700; letter-spacing: -0.03em; color: var(--text-primary);">
+          LogiStream <span style="font-weight: 400; color: var(--text-secondary);">Control Tower</span>
         </h1>
-        <p style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 500;">Intelligent Supply Chain & Telemetry Control Tower</p>
+        <p style="font-size: 0.7rem; color: var(--text-muted); font-weight: 500;">Multi-Module Real-time Telemetry Pipeline</p>
       </div>
     </div>
     
-    <!-- Real-time metrics in header -->
-    <div style="display: flex; gap: 24px; align-items: center; font-size: 0.85rem;">
-      <div style="display: flex; align-items: center; gap: 8px;">
-        <span style="width: 8px; height: 8px; border-radius: 50%;" [style.background-color]="wsConnected ? '#10b981' : '#f43f5e'" [style.box-shadow]="wsConnected ? '0 0 8px #10b981' : '0 0 8px #f43f5e'"></span>
-        <span style="color: var(--text-secondary); font-weight: 600;">{{ wsConnected ? 'WS CONNECTED' : 'WS OFFLINE' }}</span>
+    <!-- Connection Statuses -->
+    <div style="display: flex; gap: 20px; align-items: center; font-size: 0.8rem;">
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <span style="width: 6px; height: 6px; border-radius: 50%;" [style.background-color]="wsConnected ? '#10b981' : '#ef4444'"></span>
+        <span style="color: var(--text-secondary); font-weight: 600; font-size: 0.75rem;">{{ wsConnected ? 'Connected' : 'Offline' }}</span>
       </div>
       
-      <div style="height: 24px; width: 1px; background: rgba(255,255,255,0.08);"></div>
+      <div style="height: 16px; width: 1px; background: var(--panel-border);"></div>
       
-      <div style="display: flex; flex-direction: column; align-items: flex-end;">
-        <span style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Active Sessions</span>
-        <span style="color: #0ea5e9; font-weight: 800; font-size: 0.95rem;">{{ activeSessions }} <span style="font-size: 0.7rem; color: var(--text-secondary); font-weight: 400;">clients</span></span>
+      <div style="display: flex; gap: 4px; align-items: center;">
+        <span style="color: var(--text-muted); font-size: 0.75rem;">Sessions:</span>
+        <span style="color: var(--primary); font-weight: 700;">{{ activeSessions }}</span>
       </div>
 
-      <div style="height: 24px; width: 1px; background: rgba(255,255,255,0.08);"></div>
+      <div style="height: 16px; width: 1px; background: var(--panel-border);"></div>
 
-      <span class="badge-virtual-thread">ForkJoinPool-Loom</span>
+      <span class="badge-virtual-thread">vThreads</span>
     </div>
   </header>
 
-  <!-- Performance & Bandwidth Stats Grid -->
+  <!-- Metrics Row -->
   <div class="stat-grid">
-    <div class="glass-panel" style="padding: 16px; display: flex; align-items: center; gap: 16px;">
-      <div style="background: rgba(14, 165, 233, 0.1); padding: 12px; border-radius: 12px; border: 1px solid rgba(14, 165, 233, 0.2);">
-        <!-- Inbound stream icon -->
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#0ea5e9" width="24" height="24">
-          <path d="M16 17.01V10h-2v7.01h-3L15 21l4-3.99h-3zM9 3L5 6.99h3V14h2V6.99h3L9 3z"/>
+    <div class="glass-panel" style="padding: 14px; display: flex; align-items: center; gap: 14px;">
+      <div style="background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; border: 1px solid var(--panel-border);">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <polyline points="19 12 12 19 5 12"></polyline>
         </svg>
       </div>
       <div>
-        <span style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 700;">Inbound WebSockets</span>
-        <h2 style="font-size: 1.5rem; font-weight: 800; color: #f3f4f6;">{{ rawTelemetryRate }} <span style="font-size: 0.8rem; font-weight: 500; color: var(--text-secondary);">req/s</span></h2>
+        <span style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em;">Inbound Stream</span>
+        <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--text-primary);">{{ rawTelemetryRate }} <span style="font-size: 0.75rem; font-weight: 400; color: var(--text-muted);">evt/s</span></h2>
       </div>
     </div>
     
-    <div class="glass-panel" style="padding: 16px; display: flex; align-items: center; gap: 16px;">
-      <div style="background: rgba(16, 185, 129, 0.1); padding: 12px; border-radius: 12px; border: 1px solid rgba(16, 185, 129, 0.2);">
-        <!-- Throttled speed icon -->
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#10b981" width="24" height="24">
-          <path d="M20.38 8.57l-1.23 1.85a8 8 0 0 1-.22 7.58H5.07A8 8 0 0 1 12 6a7.92 7.92 0 0 1 6.27 3.07l1.41-1.41A9.93 9.93 0 0 0 12 4a10 10 0 0 0-7.75 16.3h15.5A10 10 0 0 0 20.38 8.57zM10.85 12.14a2 2 0 0 1 2.23-.27l4.02-4.02-1.41-1.41-4.02 4.02a2 2 0 0 1-.82 1.68z"/>
+    <div class="glass-panel" style="padding: 14px; display: flex; align-items: center; gap: 14px;">
+      <div style="background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; border: 1px solid var(--panel-border);">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+          <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+          <polyline points="2 17 12 22 22 17"></polyline>
+          <polyline points="2 12 12 17 22 12"></polyline>
         </svg>
       </div>
       <div>
-        <span style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 700;">RxJS Throttled Render</span>
-        <h2 style="font-size: 1.5rem; font-weight: 800; color: #10b981;">
-          {{ throttledTelemetryRate }} <span style="font-size: 0.8rem; font-weight: 500; color: var(--text-secondary);">fps</span>
-          <span style="font-size: 0.75rem; color: #10b981; margin-left: 8px; font-weight: 600;">(-{{ calculateBandwidthSaving() }}% Load)</span>
+        <span style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em;">RxJS UI Throttle</span>
+        <h2 style="font-size: 1.25rem; font-weight: 700; color: #10b981;">
+          {{ throttledTelemetryRate }} <span style="font-size: 0.75rem; font-weight: 400; color: var(--text-muted);">render/s</span>
+          <span style="font-size: 0.7rem; color: var(--text-muted); margin-left: 6px;">(-{{ calculateBandwidthSaving() }}%)</span>
         </h2>
       </div>
     </div>
 
-    <div class="glass-panel" style="padding: 16px; display: flex; align-items: center; gap: 16px;">
-      <div style="background: rgba(139, 92, 246, 0.1); padding: 12px; border-radius: 12px; border: 1px solid rgba(139, 92, 246, 0.2);">
-        <!-- Active trucks icon -->
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#8b5cf6" width="24" height="24">
-          <path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm12 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-7l2.25 3H17v-3h2.5z"/>
+    <div class="glass-panel" style="padding: 14px; display: flex; align-items: center; gap: 14px;">
+      <div style="background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; border: 1px solid var(--panel-border);">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+          <rect x="1" y="3" width="15" height="13"></rect>
+          <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+          <circle cx="5.5" cy="18.5" r="2.5"></circle>
+          <circle cx="18.5" cy="18.5" r="2.5"></circle>
         </svg>
       </div>
       <div>
-        <span style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 700;">Redis Cache Nodes</span>
-        <h2 style="font-size: 1.5rem; font-weight: 800; color: #a855f7;">{{ activeVehiclesCount }} <span style="font-size: 0.8rem; font-weight: 500; color: var(--text-secondary);">Active Trucks</span></h2>
+        <span style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em;">Active Vehicles</span>
+        <h2 style="font-size: 1.25rem; font-weight: 700; color: #a78bfa;">{{ activeVehiclesCount }} <span style="font-size: 0.75rem; font-weight: 400; color: var(--text-muted);">Redis nodes</span></h2>
       </div>
     </div>
 
-    <div class="glass-panel" [class.alert-card-active]="activeAlarms.length > 0" style="padding: 16px; display: flex; align-items: center; gap: 16px;">
-      <div [style.background]="activeAlarms.length > 0 ? 'rgba(244, 63, 94, 0.15)' : 'rgba(16, 185, 129, 0.1)'" style="padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
-        <!-- Temperature alert icon -->
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" [attr.fill]="activeAlarms.length > 0 ? '#f43f5e' : '#10b981'" width="24" height="24">
-          <path d="M12 2c-1.1 0-2 .9-2 2v7.28C9.13 11.8 8.5 12.83 8.5 14c0 1.93 1.57 3.5 3.5 3.5s3.5-1.57 3.5-3.5c0-1.17-.63-2.2-1.5-2.72V4c0-1.1-.9-2-2-2zm1 9h-2V4h2v7z"/>
+    <div class="glass-panel" [class.alert-card-active]="activeAlarms.length > 0" style="padding: 14px; display: flex; align-items: center; gap: 14px;">
+      <div style="background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; border: 1px solid var(--panel-border);">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" [attr.stroke]="activeAlarms.length > 0 ? '#ef4444' : '#10b981'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+          <line x1="12" y1="9" x2="12" y2="13"></line>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
         </svg>
       </div>
       <div>
-        <span style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 700;">Sensor Diagnostics</span>
-        <h2 style="font-size: 1.5rem; font-weight: 800;" [style.color]="activeAlarms.length > 0 ? '#f43f5e' : '#10b981'">
-          {{ activeAlarms.length > 0 ? 'ANOMALY DETECTED' : 'SYSTEM HEALTHY' }}
+        <span style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em;">Thermal Status</span>
+        <h2 style="font-size: 1.25rem; font-weight: 700;" [style.color]="activeAlarms.length > 0 ? '#ef4444' : '#10b981'">
+          {{ activeAlarms.length > 0 ? 'CRITICAL ALERT' : 'COOLING NORMAL' }}
         </h2>
       </div>
     </div>
   </div>
 
-  <!-- Main Workspace Grid: Map Control tower + Configuration Deck -->
+  <!-- Dashboard Workspace Layout -->
   <div class="dashboard-grid">
     
-    <!-- LEFT COLUMN: Live Telemetry Map Visualizer -->
+    <!-- LEFT PANEL: Map Controller -->
     <div style="display: flex; flex-direction: column; gap: 16px; height: 100%;">
-      <!-- Map card -->
       <div style="flex-grow: 1; display: flex; flex-direction: column;" class="glass-panel">
-        <div style="padding: 16px 20px; border-bottom: 1px solid var(--panel-border); display: flex; justify-content: space-between; align-items: center;">
-          <h2 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
-            <span style="width: 6px; height: 6px; background: #0ea5e9; border-radius: 50%;"></span>
-            Live Geolocation Control Tower Map (OpenStreetMap)
+        <div style="padding: 12px 16px; border-bottom: 1px solid var(--panel-border); display: flex; justify-content: space-between; align-items: center;">
+          <h2 style="font-size: 0.85rem; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 6px;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+              <polygon points="3 6 9 3 15 6 21 3 21 18 15 15 9 18 3 15"></polygon>
+              <line x1="9" y1="3" x2="9" y2="18"></line>
+              <line x1="15" y1="6" x2="15" y2="21"></line>
+            </svg>
+            Live Telemetry Tracker
           </h2>
-          <span style="font-size: 0.7rem; color: var(--text-muted); font-weight: 600;">Updates: 250ms (RxJS Throttled)</span>
+          <span style="font-size: 0.7rem; color: var(--text-muted); font-weight: 500;">OSM Tiles • Leaflet Engine</span>
         </div>
-        
-        <!-- Leaflet map injection -->
-        <div id="map" style="flex-grow: 1; border-radius: 0 0 16px 16px; min-height: 380px;"></div>
+        <div id="map" style="flex-grow: 1; border-radius: 0 0 12px 12px; min-height: 380px;"></div>
       </div>
       
-      <!-- Temperature Alarm list logs -->
-      <div class="glass-panel" style="padding: 16px; height: 130px; display: flex; flex-direction: column; gap: 10px;">
-        <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Active Diagnostics & Siren Alert Queue</span>
-        <div style="flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
-          <div *ngIf="activeAlarms.length === 0" style="color: var(--text-muted); font-size: 0.8rem; text-align: center; padding-top: 12px; font-weight: 500;">
-            No temperature alarms triggered. Cooling systems are holding state.
+      <!-- Diagnostic Alarm logs -->
+      <div class="glass-panel" style="padding: 12px 16px; height: 120px; display: flex; flex-direction: column; gap: 8px;">
+        <span style="font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">System Diagnostic Logs</span>
+        <div style="flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 6px;">
+          <div *ngIf="activeAlarms.length === 0" style="color: var(--text-muted); font-size: 0.75rem; text-align: center; padding-top: 16px;">
+            Diagnostics steady. No temperature warning flags detected in Redis cluster.
           </div>
-          <div *ngFor="let alarm of activeAlarms" style="background: rgba(244, 63, 94, 0.08); border: 1px solid rgba(244, 63, 94, 0.2); border-left: 4px solid var(--danger); padding: 8px 16px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
-            <div style="font-size: 0.8rem; display: flex; align-items: center; gap: 8px;">
-              <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--danger); animation: flash-siren 0.5s infinite alternate;"></span>
-              <span>Vehicle <strong>{{ alarm.vehicleId }}</strong> container temperature exceeded safety limit: <strong style="color: var(--danger);">{{ alarm.temperature }}°C</strong> (Anomaly flagged in Redis)</span>
+          <div *ngFor="let alarm of activeAlarms" style="background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.15); border-left: 3px solid var(--danger); padding: 6px 12px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-size: 0.75rem; display: flex; align-items: center; gap: 6px;">
+              <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--danger);"></span>
+              <span><strong>[CRITICAL]</strong> Vehicle <strong>{{ alarm.vehicleId }}</strong> container temperature exceeded threshold: <strong style="color: var(--danger);">{{ alarm.temperature }}°C</strong></span>
             </div>
-            <span style="font-size: 0.75rem; color: var(--text-muted); font-family: monospace;">{{ alarm.timestamp | date:'HH:mm:ss' }}</span>
+            <span style="font-size: 0.7rem; color: var(--text-muted); font-family: monospace;">{{ alarm.timestamp | date:'HH:mm:ss' }}</span>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- RIGHT COLUMN: Simulator & Processors Controls -->
-    <div style="display: flex; flex-direction: column; gap: 20px; height: 100%; overflow-y: auto;">
+    <!-- RIGHT PANEL: Controllers Deck -->
+    <div style="display: flex; flex-direction: column; gap: 16px; height: 100%; overflow-y: auto;">
       
-      <!-- Card 1: Telemetry Stream Simulator Controls -->
-      <div class="glass-panel" style="padding: 20px; display: flex; flex-direction: column; gap: 14px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--panel-border); padding-bottom: 10px;">
-          <h3 style="font-size: 0.9rem; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 6px;">
+      <!-- Card 1: Telemetry Simulator -->
+      <div class="glass-panel" style="padding: 16px; display: flex; flex-direction: column; gap: 12px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--panel-border); padding-bottom: 8px;">
+          <h3 style="font-size: 0.85rem; font-weight: 700; color: var(--text-primary);">
             IoT Telemetry Simulator
           </h3>
-          <span style="font-size: 0.65rem; background: rgba(14, 165, 233, 0.15); color: #0ea5e9; padding: 2px 6px; border-radius: 4px; font-weight: 700;">Inbound Engine</span>
+          <span style="font-size: 0.6rem; background: rgba(255,255,255,0.05); border: 1px solid var(--panel-border); color: var(--text-secondary); padding: 1px 4px; border-radius: 3px;">Local WebSocket</span>
         </div>
         
-        <div style="display: flex; gap: 12px;">
+        <div style="display: flex; gap: 10px;">
           <button (click)="toggleTelemetrySimulator()" 
-                  [style.background]="simRunning ? 'var(--danger)' : 'var(--success)'"
-                  [style.box-shadow]="simRunning ? '0 0 10px var(--danger-glow)' : '0 0 10px var(--success-glow)'"
-                  style="color: white; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 700; cursor: pointer; flex-grow: 1; font-size: 0.8rem;">
-            {{ simRunning ? 'STOP TELEMETRY SIMULATOR' : 'START TELEMETRY SIMULATOR' }}
+                  [style.background]="simRunning ? 'var(--danger)' : 'rgba(255,255,255,0.03)'"
+                  [style.border-color]="simRunning ? 'var(--danger)' : 'var(--panel-border)'"
+                  style="color: white; padding: 8px 14px; border-radius: 6px; font-weight: 600; cursor: pointer; flex-grow: 1; font-size: 0.75rem; border: 1px solid var(--panel-border);">
+            {{ simRunning ? 'STOP SIMULATION' : 'START TELEMETRY STREAM' }}
           </button>
           
           <button (click)="triggerTempAnomaly()" 
-                  [style.background]="tempAnomalyTriggered ? 'rgba(244,63,94,0.2)' : 'rgba(255,255,255,0.03)'"
+                  [style.background]="tempAnomalyTriggered ? 'rgba(239,68,68,0.1)' : 'transparent'"
                   [style.border-color]="tempAnomalyTriggered ? 'var(--danger)' : 'var(--panel-border)'"
-                  [style.color]="tempAnomalyTriggered ? 'var(--danger)' : 'var(--text-primary)'"
-                  style="border: 1px solid; padding: 10px; border-radius: 8px; font-weight: 700; cursor: pointer;">
-            ⚡ ANOMALY (TR-2)
+                  [style.color]="tempAnomalyTriggered ? 'var(--danger)' : 'var(--text-secondary)'"
+                  style="border: 1px solid var(--panel-border); padding: 8px 12px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.75rem;">
+            ANOMALY (TR-2)
           </button>
         </div>
         
-        <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4;">
-          Generates coordinate tracks for 3 courier trucks around Jakarta. Sends telemetry payloads to WebSocket engine on <code style="color: #0ea5e9; font-weight: bold;">/app/telemetry</code> every 500ms.
+        <p style="font-size: 0.7rem; color: var(--text-muted); line-height: 1.4;">
+          Feeds real-time route detours around Central Jakarta to websocket STOMP path <code style="color: var(--primary);">/app/telemetry</code>.
         </p>
       </div>
 
-      <!-- Card 2: State-Machine package sorting simulator -->
-      <div class="glass-panel" style="padding: 20px; display: flex; flex-direction: column; gap: 14px; flex-grow: 1; min-height: 300px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--panel-border); padding-bottom: 10px;">
-          <h3 style="font-size: 0.9rem; font-weight: 700; color: var(--text-primary);">
-            Warehouse State Transition Console
+      <!-- Card 2: State-Machine packages list -->
+      <div class="glass-panel" style="padding: 16px; display: flex; flex-direction: column; gap: 12px; flex-grow: 1; min-height: 250px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--panel-border); padding-bottom: 8px;">
+          <h3 style="font-size: 0.85rem; font-weight: 700; color: var(--text-primary);">
+            Warehouse Processing Console
           </h3>
-          <span style="font-size: 0.65rem; background: rgba(139, 92, 246, 0.15); color: #a78bfa; padding: 2px 6px; border-radius: 4px; font-weight: 700;">Project Loom</span>
+          <span style="font-size: 0.6rem; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--panel-border); color: var(--text-secondary); padding: 1px 4px; border-radius: 3px;">Virtual Threads</span>
         </div>
         
-        <div style="display: flex; gap: 10px; align-items: center;">
-          <span style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 600;">Batch Size:</span>
-          <input type="number" [(ngModel)]="simulationBatchSize" style="width: 55px; background: rgba(0,0,0,0.3); border: 1px solid var(--panel-border); color: white; padding: 8px; border-radius: 6px; text-align: center; font-weight: bold; outline: none;" />
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <span style="font-size: 0.75rem; color: var(--text-secondary);">Batch Size:</span>
+          <input type="number" [(ngModel)]="simulationBatchSize" style="width: 50px; text-align: center;" />
           
           <button (click)="runSortingSimulation()" 
-                  style="background: var(--secondary); color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 700; cursor: pointer; flex-grow: 1; font-size: 0.8rem; box-shadow: 0 0 10px rgba(139, 92, 246, 0.3);">
-            SPAWN SORTING BATCH
+                  style="background: var(--primary); color: white; border: none; padding: 8px 14px; border-radius: 6px; font-weight: 600; cursor: pointer; flex-grow: 1; font-size: 0.75rem;">
+            SPAWN BATCH
           </button>
         </div>
 
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px;">
-          <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Active Transitions (Postgres logs)</span>
-          <button (click)="loadPackages()" style="background: transparent; border: none; color: #0ea5e9; font-size: 0.75rem; cursor: pointer; font-weight: 700; padding: 0;">
-            🔄 Refresh Logs
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+          <span style="font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Transaction Log (PostgreSQL)</span>
+          <button (click)="loadPackages()" style="background: transparent; border: none; color: var(--primary); font-size: 0.7rem; cursor: pointer; font-weight: 700; padding: 0;">
+            Refresh Logs
           </button>
         </div>
 
-        <!-- Packages scrollable table list -->
-        <div style="flex-grow: 1; overflow-y: auto; border: 1px solid var(--panel-border); border-radius: 8px; background: rgba(0,0,0,0.15); max-height: 300px;">
+        <!-- Scrollable Table -->
+        <div style="flex-grow: 1; overflow-y: auto; border: 1px solid var(--panel-border); border-radius: 6px; background: rgba(0,0,0,0.15); max-height: 250px;">
           <table>
             <thead>
               <tr>
-                <th style="padding: 10px 12px; width: 30%;">Package ID</th>
-                <th style="padding: 10px 12px; width: 35%;">Lifecycle State</th>
-                <th style="padding: 10px 12px; width: 35%;">Java virtual thread</th>
+                <th style="padding: 8px 10px; width: 30%;">ID</th>
+                <th style="padding: 8px 10px; width: 35%;">Status State</th>
+                <th style="padding: 8px 10px; width: 35%;">Virtual Thread</th>
               </tr>
             </thead>
             <tbody>
               <tr *ngIf="packages.length === 0">
-                <td colspan="3" style="padding: 24px; text-align: center; color: var(--text-muted); font-weight: 500;">
-                  No packages in system. Spawn a batch above to process via Loom Virtual Threads.
+                <td colspan="3" style="padding: 16px; text-align: center; color: var(--text-muted); font-size: 0.75rem;">
+                  No active logs. Click "Spawn Batch" to initiate.
                 </td>
               </tr>
               <tr *ngFor="let pkg of packages">
-                <td style="padding: 10px 12px; font-weight: 700; color: #0ea5e9; font-family: monospace;">{{ pkg.packageId }}</td>
-                <td style="padding: 10px 12px;">
-                  <span [style.background-color]="getStateColor(pkg.state)" style="padding: 2px 8px; border-radius: 4px; font-weight: 700; font-size: 0.65rem; color: #000; letter-spacing: 0.02em;">
+                <td style="padding: 8px 10px; font-weight: 700; color: var(--primary); font-family: monospace;">{{ pkg.packageId }}</td>
+                <td style="padding: 8px 10px;">
+                  <span [style.background-color]="getStateColor(pkg.state)" style="padding: 1px 6px; border-radius: 3px; font-weight: 600; font-size: 0.6rem; color: #fff;">
                     {{ pkg.state }}
                   </span>
                 </td>
-                <td style="padding: 10px 12px;">
-                  <span class="badge-virtual-thread" style="font-size: 0.65rem;">
+                <td style="padding: 8px 10px;">
+                  <span class="badge-virtual-thread" style="font-size: 0.6rem;">
                     {{ cleanThreadName(pkg.lastUpdatedByThread) }}
                   </span>
                 </td>

@@ -1,28 +1,21 @@
 @import "leaflet/dist/leaflet.css";
 
-/* Premium Dark Mode Design Tokens */
+/* SaaS Minimalist Glassmorphism Design System */
 :root {
-  --bg-color: #0b0f19;
-  --panel-bg: rgba(17, 24, 39, 0.75);
-  --panel-border: rgba(255, 255, 255, 0.05);
+  --bg-color: #09090b; /* zinc-950 */
+  --panel-bg: rgba(24, 24, 27, 0.7); /* zinc-900 with transparency */
+  --panel-border: rgba(255, 255, 255, 0.08);
   
-  --primary: #0ea5e9;
-  --primary-glow: rgba(14, 165, 233, 0.4);
-  --secondary: #8b5cf6;
+  --primary: #3b82f6; /* SaaS Royal Blue */
+  --success: #10b981; /* Emerald */
+  --warning: #f59e0b; /* Amber */
+  --danger: #ef4444; /* Rose/Red */
   
-  --success: #10b981;
-  --success-glow: rgba(16, 185, 129, 0.25);
-  
-  --warning: #f59e0b;
-  --danger: #f43f5e;
-  --danger-glow: rgba(244, 63, 94, 0.4);
-  
-  --text-primary: #f3f4f6;
-  --text-secondary: #9ca3af;
-  --text-muted: #6b7280;
+  --text-primary: #fafafa; /* zinc-50 */
+  --text-secondary: #a1a1aa; /* zinc-400 */
+  --text-muted: #71717a; /* zinc-500 */
   
   --font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --header-height: 70px;
 }
 
 * {
@@ -35,45 +28,64 @@ body {
   background-color: var(--bg-color);
   color: var(--text-primary);
   font-family: var(--font-family);
+  letter-spacing: -0.02em;
   overflow-x: hidden;
   height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
-/* Glassmorphic Panels */
+/* Glassmorphic SaaS Panels */
 .glass-panel {
   background: var(--panel-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--panel-border);
-  border-radius: 16px;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease-in-out;
 }
 
 .glass-panel:hover {
-  border-color: rgba(255, 255, 255, 0.08);
-  box-shadow: 0 4px 40px rgba(0, 0, 0, 0.6);
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
 }
 
-/* Buttons styling */
+/* Premium Minimalist Input Control */
+input[type="number"] {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--panel-border);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  outline: none;
+  font-family: var(--font-family);
+  font-size: 0.8rem;
+  transition: border-color 0.15s ease-in-out;
+}
+
+input[type="number"]:focus {
+  border-color: var(--primary);
+}
+
+/* Premium SaaS Buttons */
 button {
   font-family: var(--font-family);
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 600;
-  padding: 10px 20px;
-  border-radius: 8px;
+  padding: 10px 18px;
+  border-radius: 6px;
   border: 1px solid transparent;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  letter-spacing: -0.01em;
+  transition: all 0.15s ease-in-out;
 }
 
 button:active {
-  transform: scale(0.98);
+  transform: translateY(1px);
 }
 
-/* Tables styling */
+/* Flat minimalist tables */
 table {
   width: 100%;
   border-collapse: separate;
@@ -81,20 +93,20 @@ table {
 }
 
 th {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   text-transform: uppercase;
   color: var(--text-secondary);
   font-weight: 700;
-  letter-spacing: 0.05em;
-  padding: 12px 16px;
+  letter-spacing: 0.03em;
+  padding: 10px 14px;
   border-bottom: 1px solid var(--panel-border);
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(255, 255, 255, 0.01);
 }
 
 td {
-  padding: 12px 16px;
-  font-size: 0.8rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+  padding: 10px 14px;
+  font-size: 0.78rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
   color: var(--text-primary);
 }
 
@@ -102,50 +114,46 @@ tr:hover td {
   background: rgba(255, 255, 255, 0.02);
 }
 
-/* Custom Map Markers (SVG wrappers) */
+/* Flat Leaflet Custom Icons styles */
 .hub-marker-icon, .vehicle-marker-icon {
   background: none !important;
   border: none !important;
   outline: none !important;
 }
 
-/* Keyframe Animations */
-@keyframes pulse-ring {
-  0% { transform: scale(0.5); opacity: 1; }
-  100% { transform: scale(1.6); opacity: 0; }
+/* Flat animation alerts (no heavy neon pulsing rings) */
+@keyframes siren-flash-flat {
+  0% { transform: scale(0.9); opacity: 0.8; }
+  100% { transform: scale(1.1); opacity: 1; }
 }
 
-@keyframes flash-siren {
-  0% { background-color: var(--danger); box-shadow: 0 0 4px var(--danger); }
-  100% { background-color: #ff4d6d; box-shadow: 0 0 16px #ff4d6d; }
-}
-
-@keyframes card-alert {
-  0% { border-color: rgba(244, 63, 94, 0.2); }
-  100% { border-color: rgba(244, 63, 94, 0.8); box-shadow: 0 0 15px rgba(244, 63, 94, 0.2); }
+@keyframes border-glow-subtle {
+  0% { border-color: rgba(239, 68, 68, 0.2); }
+  100% { border-color: rgba(239, 68, 68, 0.6); }
 }
 
 .alert-card-active {
-  animation: card-alert 0.8s infinite alternate;
+  animation: border-glow-subtle 1s infinite alternate;
   border: 1px solid var(--danger) !important;
 }
 
 /* Badge Virtual Threads */
 .badge-virtual-thread {
-  background: rgba(139, 92, 246, 0.15);
-  border: 1px solid rgba(139, 92, 246, 0.3);
-  color: #c084fc;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--panel-border);
+  color: var(--text-secondary);
   font-family: monospace;
-  font-weight: 600;
-  padding: 2px 8px;
+  font-weight: 500;
+  padding: 2px 6px;
   border-radius: 4px;
+  font-size: 0.7rem;
 }
 
-/* Responsive Grid & Layout Utilities */
+/* Grid & Layout Utilities */
 .dashboard-grid {
   display: grid;
   grid-template-columns: 1.3fr 0.7fr;
-  gap: 20px;
+  gap: 16px;
   flex-grow: 1;
   min-height: 0;
 }
@@ -164,21 +172,21 @@ tr:hover td {
 .stat-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
+  gap: 16px;
 }
 
 /* Scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: rgba(11, 15, 25, 0.5);
+  background: rgba(9, 9, 11, 0.5);
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(156, 163, 175, 0.2);
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(156, 163, 175, 0.4);
+  background: rgba(255, 255, 255, 0.2);
 }
