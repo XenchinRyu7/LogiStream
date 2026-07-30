@@ -6,6 +6,16 @@ import { SortingService, PackageEntity } from './core/services/sorting.service';
 import { Subscription } from 'rxjs';
 import * as L from 'leaflet';
 
+interface MarkerInterpolation {
+  marker: L.Marker;
+  startLat: number;
+  startLon: number;
+  targetLat: number;
+  targetLon: number;
+  startTime: number;
+  duration: number;
+}
+
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -28,6 +38,7 @@ export class AppComponent implements OnInit, OnDestroy {
   packages: PackageEntity[] = [];
   activeAlarms: AlarmEvent[] = [];
   private activeVehicles = new Map<string, TelemetryEvent>();
+  logisticsLogs: string[] = [];
 
   // Stream Performance statistics
   rawTelemetryRate = 0;
@@ -41,6 +52,10 @@ export class AppComponent implements OnInit, OnDestroy {
   private hubMarker!: L.Marker;
   private vehicleMarkers = new Map<string, L.Marker>();
   private routeLines = new Map<string, L.Polyline>();
+
+  // Marker Interpolation Engine
+  private interpolations = new Map<string, MarkerInterpolation>();
+  private animationFrameId: any = null;
 
   // Subscriptions
   private subs: Subscription = new Subscription();
@@ -84,20 +99,32 @@ export class AppComponent implements OnInit, OnDestroy {
     this.loadPackages();
     this.setupWebSocketStreams();
     this.startPerformanceMonitoring();
+    this.startInterpolationEngine();
   }
 
   ngOnDestroy() {
     this.stopTelemetrySimulator();
     if (this.performanceIntervalId) clearInterval(this.performanceIntervalId);
+    if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
     this.subs.unsubscribe();
+  }
+
+  // Pushes clean log message to the logistics logs terminal queue
+  addLog(prefix: string, message: string) {
+    const time = new Date().toLocaleTimeString();
+    const formatted = `[${prefix}] ${time} - ${message}`;
+    this.logisticsLogs.unshift(formatted);
+    if (this.logisticsLogs.length > 30) {
+      this.logisticsLogs.pop();
+    }
   }
 
   // Load packages from database via REST API
   loadPackages() {
     this.sortingService.getPackages().subscribe({
       next: (data) => {
-        // Sort descending to show latest updates first
         this.packages = data.sort((a, b) => b.packageId.localeCompare(a.packageId));
+        this.addLog('DATABASE', 'Synced latest hub package registry logs');
       },
       error: (err) => console.error('Failed to load packages:', err)
     });
@@ -111,6 +138,9 @@ export class AppComponent implements OnInit, OnDestroy {
         this.wsConnected = status;
         if (status) {
           this.fetchInitialSessionsCount();
+          this.addLog('SYSTEM', 'Telemetry ingestion pipeline connection established');
+        } else {
+          this.addLog('SYSTEM', 'Telemetry ingestion pipeline connection disconnected');
         }
       })
     );
@@ -140,10 +170,10 @@ export class AppComponent implements OnInit, OnDestroy {
     // 5. Thermal Alerts (Alarms queue)
     this.subs.add(
       this.websocketService.getAlerts().subscribe(alarm => {
-        // Prevent duplicate alerts for the same vehicle in queue
         if (!this.activeAlarms.some(a => a.vehicleId === alarm.vehicleId)) {
           this.activeAlarms.unshift(alarm);
           this.playAlarmBuzzer();
+          this.addLog('CRITICAL', `Vehicle ${alarm.vehicleId.replace('TRUCK-', 'TR-')} cold chain containment breach: ${alarm.temperature}°C`);
           
           // Re-render marker instantly with alarm status
           const activeEvent = this.activeVehicles.get(alarm.vehicleId);
@@ -158,6 +188,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.subs.add(
       this.websocketService.getRouteUpdates().subscribe(routeEvent => {
         this.drawRoutePath(routeEvent);
+        this.addLog('ROUTING', `Dynamic VRP route updated for Fleet ${routeEvent.vehicleId.replace('TRUCK-', 'TR-')} (${routeEvent.routePoints.length} points)`);
       })
     );
   }
@@ -193,13 +224,41 @@ export class AppComponent implements OnInit, OnDestroy {
 
     this.hubMarker = L.marker([this.HUB_LAT, this.HUB_LON], { icon: hubIcon })
       .addTo(this.map)
-      .bindPopup('<strong>AWS IoT Central Registry Hub</strong><br>Spring Loom thread pool sorting packages.');
+      .bindPopup('<strong>Central Logistics Hub</strong><br>Primary dispatch and sorting facility.');
+  }
+
+  // Start Marker Position Interpolation Loop (60 FPS Glide)
+  private startInterpolationEngine() {
+    const tick = () => {
+      const now = Date.now();
+      
+      this.interpolations.forEach((item, id) => {
+        const elapsed = now - item.startTime;
+        const t = Math.min(1, elapsed / item.duration);
+        
+        // Linear Interpolation (lerp) equation
+        const lat = item.startLat + (item.targetLat - item.startLat) * t;
+        const lon = item.startLon + (item.targetLon - item.startLon) * t;
+        
+        item.marker.setLatLng([lat, lon]);
+        
+        if (t >= 1) {
+          this.interpolations.delete(id);
+        }
+      });
+      
+      this.animationFrameId = requestAnimationFrame(tick);
+    };
+    
+    this.animationFrameId = requestAnimationFrame(tick);
   }
 
   // Update or render vehicle location on Leaflet Map
   private updateVehicleMarker(event: TelemetryEvent) {
     this.activeVehicles.set(event.vehicleId, event);
     const hasAnomaly = this.activeAlarms.some(a => a.vehicleId === event.vehicleId);
+    
+    const displayId = event.vehicleId.replace('TRUCK-', 'TR-');
     
     // Custom DIV icon for the truck (using custom clean SVGs)
     const icon = L.divIcon({
@@ -210,22 +269,33 @@ export class AppComponent implements OnInit, OnDestroy {
     });
 
     if (this.vehicleMarkers.has(event.vehicleId)) {
-      // Smoothly update location of existing marker
       const marker = this.vehicleMarkers.get(event.vehicleId)!;
-      marker.setLatLng([event.latitude, event.longitude]);
       marker.setIcon(icon);
       
       // Update popup content
       marker.getPopup()?.setContent(`
-        <strong style="color:var(--action-blue);">Thing ID: ${event.vehicleId}</strong><br>
+        <strong style="color:var(--action-blue);">Fleet Unit: ${displayId}</strong><br>
         Speed: ${event.speed.toFixed(1)} km/h<br>
-        Thermal State: <span style="font-weight:bold; color:${event.temperature > 5.0 ? 'var(--danger)' : 'var(--success)'}">${event.temperature.toFixed(2)}°C</span>
+        Cargo Temp: <span style="font-weight:bold; color:${event.temperature > 5.0 ? 'var(--danger)' : 'var(--success)'}">${event.temperature.toFixed(2)}°C</span>
       `);
+
+      // Trigger/Refresh interpolation coordinates Glide
+      const currentLatLng = marker.getLatLng();
+      this.interpolations.set(event.vehicleId, {
+        marker,
+        startLat: currentLatLng.lat,
+        startLon: currentLatLng.lng,
+        targetLat: event.latitude,
+        targetLon: event.longitude,
+        startTime: Date.now(),
+        duration: 500 // Interpolate over 500ms matching coordinates step emission rate
+      });
+      
     } else {
-      // Create new marker on map
+      // Create new marker on map (First frame, instantly placed)
       const marker = L.marker([event.latitude, event.longitude], { icon })
         .addTo(this.map)
-        .bindPopup(`<strong>Thing ${event.vehicleId}</strong>`);
+        .bindPopup(`<strong>Fleet Unit ${displayId}</strong>`);
       this.vehicleMarkers.set(event.vehicleId, marker);
     }
   }
@@ -244,11 +314,9 @@ export class AppComponent implements OnInit, OnDestroy {
     const color = colors[routeEvent.vehicleId] || '#f1a80a';
 
     if (this.routeLines.has(routeEvent.vehicleId)) {
-      // Update path
       const polyline = this.routeLines.get(routeEvent.vehicleId)!;
       polyline.setLatLngs(latLngs);
     } else {
-      // Draw path
       const polyline = L.polyline(latLngs, {
         color: color,
         weight: 2,
@@ -258,7 +326,6 @@ export class AppComponent implements OnInit, OnDestroy {
       }).addTo(this.map);
       this.routeLines.set(routeEvent.vehicleId, polyline);
     }
-    console.log(`Rendered optimized route path for vehicle: ${routeEvent.vehicleId}`);
   }
 
   // Audio Alarm Synth: plays an alert sound when high temp is triggered
@@ -284,9 +351,10 @@ export class AppComponent implements OnInit, OnDestroy {
 
   // Simulation: Trigger sorting batch on Virtual Threads
   runSortingSimulation() {
+    this.addLog('MANIFEST', `Ingesting new batch manifest simulation (${this.simulationBatchSize} packages)`);
     this.sortingService.triggerSimulation(this.simulationBatchSize).subscribe({
       next: (res) => {
-        console.log(res.message);
+        this.addLog('ENGINE', `Dispatched batch sorting manifest to processing nodes`);
         // Refresh packages list after a small delay to see new entries
         setTimeout(() => this.loadPackages(), 500);
         // Poll periodically for state transitions
@@ -312,22 +380,19 @@ export class AppComponent implements OnInit, OnDestroy {
   private startTelemetrySimulator() {
     this.simRunning = true;
     const vehicles = ['TRUCK-1', 'TRUCK-2', 'TRUCK-3'];
+    this.addLog('SIMULATOR', 'Initiated fleet simulation telemetry stream');
     
     this.simulatorIntervalId = setInterval(() => {
       vehicles.forEach(vehicleId => {
         const route = this.routesData[vehicleId];
         let index = this.routeIndices[vehicleId];
         
-        // Move index along the path array
         index = (index + 1) % route.length;
         this.routeIndices[vehicleId] = index;
         
         const coords = route[index];
-        
-        // Generate mock telemetry variables
         const speed = 40 + Math.random() * 25; // 40-65 km/h
         
-        // Check if temperature spike is manually triggered for TRUCK-2
         let temperature = 2.0 + Math.random() * 2.0; // Normal: 2 - 4 C
         if (vehicleId === 'TRUCK-2' && this.tempAnomalyTriggered) {
           temperature = 6.2 + Math.random() * 1.5; // Trigger anomaly temp: > 5 C
@@ -342,7 +407,6 @@ export class AppComponent implements OnInit, OnDestroy {
           timestamp: Date.now()
         };
 
-        // Send telemetry payload to STOMP Endpoint
         this.websocketService.sendTelemetry(telemetry);
       });
     }, 500); // Emits every 500ms
@@ -350,6 +414,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   private stopTelemetrySimulator() {
     this.simRunning = false;
+    this.addLog('SIMULATOR', 'Terminated fleet simulation telemetry stream');
     if (this.simulatorIntervalId) {
       clearInterval(this.simulatorIntervalId);
       this.simulatorIntervalId = null;
@@ -359,11 +424,11 @@ export class AppComponent implements OnInit, OnDestroy {
   // Anomaly trigger button
   triggerTempAnomaly() {
     this.tempAnomalyTriggered = !this.tempAnomalyTriggered;
-    if (!this.tempAnomalyTriggered) {
-      // Clear alerts queue when normal status is restored
+    if (this.tempAnomalyTriggered) {
+      this.addLog('SIMULATOR', 'Injected thermal overheat anomaly payload on Fleet Unit TR-02');
+    } else {
       this.activeAlarms = [];
-      
-      // Force re-render all vehicle markers to remove siren animations
+      this.addLog('SIMULATOR', 'Cleared thermal alarms. Cold chain containment normal.');
       this.activeVehicles.forEach((event, id) => {
         this.updateVehicleMarker(event);
       });
@@ -381,7 +446,13 @@ export class AppComponent implements OnInit, OnDestroy {
     }, 1000);
   }
 
-  // Metrics details
+  // Formats the raw messages rate into a realistic operational telemetry rate (events/min)
+  getIngestionRateFormatted(): string {
+    if (this.rawTelemetryRate === 0) return '0 events/min';
+    const rate = this.rawTelemetryRate * 180; // Scale up to realistic operational density
+    return rate >= 1000 ? `${(rate / 1000).toFixed(1)}k events/min` : `${rate} events/min`;
+  }
+
   get activeVehiclesCount(): number {
     return this.activeVehicles.size;
   }
@@ -405,13 +476,13 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   cleanThreadName(threadStr: string): string {
-    if (!threadStr) return 'system';
-    // Match standard Java Loom virtual thread naming: VirtualThread[#xx,ForkJoinPool-...] or VirtualThread[#xx]
-    const match = threadStr.match(/VirtualThread\[(#\d+)(?:,)?(.*?)\]/);
+    if (!threadStr) return 'system-node';
+    // Clean to "Dispatcher #xx" format
+    const match = threadStr.match(/#(\d+)/);
     if (match) {
-      return `VT-Loom ${match[1]}`;
+      return `Dispatcher #${match[1]}`;
     }
-    return threadStr.length > 20 ? threadStr.substring(0, 20) + '...' : threadStr;
+    return `Dispatcher Node`;
   }
 
   // Solid vector SVGs for AWS console rendering

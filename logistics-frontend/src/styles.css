@@ -204,3 +204,34 @@ tr:hover td {
 ::-webkit-scrollbar-thumb:hover {
   background: #5f7085;
 }
+
+/* Sleek Dark Theme Leaflet Popups */
+.leaflet-popup-content-wrapper {
+  background: #1c222e !important;
+  color: #eaeded !important;
+  border: 1px solid #354a5f !important;
+  border-radius: 4px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6) !important;
+}
+
+.leaflet-popup-tip {
+  background: #1c222e !important;
+  border-left: 1px solid #354a5f !important;
+  border-bottom: 1px solid #354a5f !important;
+}
+
+.leaflet-popup-content {
+  font-family: var(--font-family) !important;
+  font-size: 0.75rem !important;
+  margin: 12px 16px !important;
+  line-height: 1.4 !important;
+}
+.leaflet-popup-close-button {
+  color: var(--text-secondary) !important;
+}
+
+/* Siren flat flash animation */
+@keyframes siren-flash-flat {
+  0% { transform: scale(0.9); opacity: 0.8; }
+  100% { transform: scale(1.1); opacity: 1; }
+}

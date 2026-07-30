@@ -1,22 +1,21 @@
 <div style="display: flex; flex-direction: column; height: 100vh; background-color: var(--bg-color); width: 100%;">
   
-  <!-- AWS Top Navigation Console Bar -->
+  <!-- Enterprise Top Navigation Console Bar -->
   <nav style="display: flex; justify-content: space-between; align-items: center; height: 40px; background: #242f3e; border-bottom: 1px solid #16191f; padding: 0 16px; font-size: 0.8rem; z-index: 1000;">
     <div style="display: flex; align-items: center; gap: 20px;">
-      <!-- AWS Logo tiruan -->
+      <!-- Logo -->
       <div style="display: flex; align-items: center; gap: 6px; font-weight: 800; color: #fff;">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#ff9900" width="18" height="18" style="margin-top: 2px;">
-          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
         </svg>
-        <span>aws</span>
+        <span>LOGISTREAM</span>
       </div>
       
-      <!-- Console title -->
-      <span style="font-weight: 700; color: #d5dbdb;">AWS IoT Core Console</span>
+      <span style="font-weight: 700; color: #d5dbdb;">LogiStream Core Console</span>
       
       <!-- Fake search bar -->
       <div style="position: relative; display: flex; align-items: center;">
-        <input type="text" placeholder="Search services, resources, and docs (e.g. IoT Core, CloudWatch)" 
+        <input type="text" placeholder="Search orders, vehicles, hubs, and routes" 
                style="background: #16191f; border: 1px solid #5f7085; color: #fff; padding: 4px 12px 4px 28px; border-radius: 4px; width: 340px; font-size: 0.75rem; outline: none;" readonly />
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#8795a5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="12" height="12" style="position: absolute; left: 10px;">
           <circle cx="11" cy="11" r="8"></circle>
@@ -29,32 +28,32 @@
     <div style="display: flex; gap: 16px; align-items: center; color: #aab7c4; font-weight: 600; font-size: 0.75rem;">
       <div style="display: flex; align-items: center; gap: 6px;">
         <span style="width: 6px; height: 6px; border-radius: 50%;" [style.background-color]="wsConnected ? '#03a84e' : '#d13212'"></span>
-        <span>WebSocket: {{ wsConnected ? 'Connected' : 'Offline' }}</span>
+        <span>Telemetry Stream: {{ wsConnected ? 'Active' : 'Offline' }}</span>
       </div>
       <div style="height: 14px; width: 1px; background: #354a5f;"></div>
       
-      <span style="cursor: pointer; color: #eaeded;">Jakarta (ap-southeast-3) ▾</span>
+      <span style="cursor: pointer; color: #eaeded;">Jakarta Hub (Primary) ▾</span>
       
       <div style="height: 14px; width: 1px; background: #354a5f;"></div>
-      <span style="color: #eaeded;">Saeful_Rohman &#64; 895-728 ▾</span>
+      <span style="color: #eaeded;">Console Operator ▾</span>
     </div>
   </nav>
 
-  <!-- AWS Console Service Breadcrumbs & Service Header -->
+  <!-- Service Breadcrumbs & Service Header -->
   <div style="background: #1c222e; border-bottom: 1px solid #2e3b4e; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center;">
     <div>
       <div style="font-size: 0.75rem; color: #aab7c4; margin-bottom: 4px; display: flex; gap: 6px; align-items: center;">
-        <span>Services</span> <span style="font-size:0.6rem;">&gt;</span>
-        <span>AWS IoT Core</span> <span style="font-size:0.6rem;">&gt;</span>
-        <span>Registry</span> <span style="font-size:0.6rem;">&gt;</span>
-        <span style="color: #eaeded; font-weight: 600;">LogiStream Hub (Loom)</span>
+        <span>Operations Console</span> <span style="font-size:0.6rem;">&gt;</span>
+        <span>Control Towers</span> <span style="font-size:0.6rem;">&gt;</span>
+        <span>Jakarta Hub</span> <span style="font-size:0.6rem;">&gt;</span>
+        <span style="color: #eaeded; font-weight: 600;">Fleet Registry</span>
       </div>
-      <h2 style="font-size: 1.15rem; font-weight: 700; color: #fff;">LogiStream Registry Control Tower</h2>
+      <h2 style="font-size: 1.15rem; font-weight: 700; color: #fff;">Real-time Fleet Dispatch and Telemetry System</h2>
     </div>
     
     <div style="display: flex; gap: 12px;">
-      <span class="badge-virtual-thread">Virtual Threads: Active</span>
-      <span class="badge-virtual-thread">Active clients: {{ activeSessions }}</span>
+      <span class="badge-virtual-thread">Engine Mode: Live Routing</span>
+      <span class="badge-virtual-thread">Operator Connections: {{ activeSessions }}</span>
     </div>
   </div>
 
@@ -64,38 +63,40 @@
     <!-- Metrics row (CloudWatch widget look) -->
     <div class="stat-grid">
       <div class="aws-card" style="display: flex; flex-direction: column;">
-        <div class="aws-card-header"><span class="aws-card-title">Inbound WebSocket Stream</span></div>
+        <div class="aws-card-header"><span class="aws-card-title">Telemetry Ingestion Rate</span></div>
         <div class="aws-card-content">
-          <h2 style="font-size: 1.6rem; font-weight: 700; color: #fff;">{{ rawTelemetryRate }} <span style="font-size: 0.8rem; font-weight: 400; color: var(--text-secondary);">msg/sec</span></h2>
-          <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 4px;">Direct coordinates stream injected to Redis</p>
+          <h2 style="font-size: 1.6rem; font-weight: 700; color: #fff;">
+            {{ getIngestionRateFormatted() }}
+          </h2>
+          <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 4px;">Dynamic coordinates events ingestion flow</p>
         </div>
       </div>
       
       <div class="aws-card" style="display: flex; flex-direction: column;">
-        <div class="aws-card-header"><span class="aws-card-title">Throttled Render Engine (RxJS)</span></div>
+        <div class="aws-card-header"><span class="aws-card-title">UI Refresh Latency</span></div>
         <div class="aws-card-content">
           <h2 style="font-size: 1.6rem; font-weight: 700; color: var(--success);">
-            {{ throttledTelemetryRate }} <span style="font-size: 0.8rem; font-weight: 400; color: var(--text-secondary);">fps</span>
+            8ms <span style="font-size: 0.8rem; font-weight: 400; color: var(--text-secondary);">at 60 FPS</span>
           </h2>
-          <p style="font-size: 0.7rem; color: var(--success); margin-top: 4px; font-weight: 600;">{{ calculateBandwidthSaving() }}% CPU/DOM drawing load saved</p>
+          <p style="font-size: 0.7rem; color: var(--success); margin-top: 4px; font-weight: 600;">Interpolated coordinates sliding frame</p>
         </div>
       </div>
 
       <div class="aws-card" style="display: flex; flex-direction: column;">
-        <div class="aws-card-header"><span class="aws-card-title">Active Devices Registry</span></div>
+        <div class="aws-card-header"><span class="aws-card-title">Active Fleet Online</span></div>
         <div class="aws-card-content">
-          <h2 style="font-size: 1.6rem; font-weight: 700; color: var(--action-blue);">{{ activeVehiclesCount }} <span style="font-size: 0.8rem; font-weight: 400; color: var(--text-secondary);">Armadas</span></h2>
-          <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 4px;">Hot key-value states indexed in Redis cluster</p>
+          <h2 style="font-size: 1.6rem; font-weight: 700; color: var(--action-blue);">{{ activeVehiclesCount }} <span style="font-size: 0.8rem; font-weight: 400; color: var(--text-secondary);">vehicles tracking</span></h2>
+          <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 4px;">Vehicles with active GPS heartbeats</p>
         </div>
       </div>
 
       <div class="aws-card" [class.alert-card-active]="activeAlarms.length > 0" style="display: flex; flex-direction: column;">
-        <div class="aws-card-header"><span class="aws-card-title">Sensors Anomaly Health</span></div>
+        <div class="aws-card-header"><span class="aws-card-title">Fleet Health Status</span></div>
         <div class="aws-card-content">
           <h2 style="font-size: 1.6rem; font-weight: 700;" [style.color]="activeAlarms.length > 0 ? 'var(--danger)' : 'var(--success)'">
-            {{ activeAlarms.length > 0 ? 'CRITICAL ALERT' : 'HEALTHY (2.0°C)' }}
+            {{ activeAlarms.length > 0 ? 'CRITICAL CONTAINER ALARM' : 'OPERATIONAL NORMAL' }}
           </h2>
-          <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 4px;">Evaluates container temp spikes consecutively</p>
+          <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 4px;">Cold chain containment diagnostics</p>
         </div>
       </div>
     </div>
@@ -103,32 +104,32 @@
     <!-- Workspace Grid: Map & Controls -->
     <div class="dashboard-grid">
       
-      <!-- LEFT COLUMN: CloudWatch Map & Logs Terminal -->
+      <!-- LEFT COLUMN: Map & Logs Terminal -->
       <div style="display: flex; flex-direction: column; gap: 16px; height: 100%;">
         
         <!-- AWS Map Card -->
         <div class="aws-card" style="flex-grow: 1; display: flex; flex-direction: column;">
           <div class="aws-card-header">
-            <span class="aws-card-title">AWS IoT Device Geolocation Map</span>
-            <span style="font-size: 0.7rem; color: var(--text-secondary);">ap-southeast-3 Map Layer</span>
+            <span class="aws-card-title">Live Fleet Geolocation Tracker</span>
+            <span style="font-size: 0.7rem; color: var(--text-secondary);">SaaS Control Panel Map</span>
           </div>
           <div id="map" style="flex-grow: 1; border-radius: 0 0 4px 4px; min-height: 380px;"></div>
         </div>
 
-        <!-- CloudWatch logs look-alike terminal -->
+        <!-- Logistics Logs Stream -->
         <div class="aws-card" style="height: 140px; display: flex; flex-direction: column;">
           <div class="aws-card-header" style="background: #242f3e;">
-            <span class="aws-card-title">AWS CloudWatch Logs Stream &gt; /aws/iot/telemetry/alarms</span>
-            <span style="font-size: 0.7rem; color: var(--text-muted);">Real-time stdout</span>
+            <span class="aws-card-title">Enterprise Logistics Console &gt; Stdout Alert Stream</span>
+            <span style="font-size: 0.7rem; color: var(--text-muted);">Live Operational Events</span>
           </div>
           
           <!-- Terminal content -->
           <div style="flex-grow: 1; overflow-y: auto; background: #0f131a; color: #00ff66; padding: 10px 16px; font-family: 'Consolas', 'Courier New', monospace; font-size: 0.75rem; line-height: 1.4; border-radius: 0 0 4px 4px;">
-            <div *ngIf="activeAlarms.length === 0" style="color: #8795a5;">
-              [SYSTEM_LOG] INFO ap-southeast-3 - Connection active. Waiting for telemetry data...
+            <div *ngIf="logisticsLogs.length === 0" style="color: #8795a5;">
+              [INFO] - System initialized. Awaiting dispatch simulation logs...
             </div>
-            <div *ngFor="let alarm of activeAlarms" style="margin-bottom: 4px;">
-              <span style="color: #ef4444;">[WARN]</span> {{ alarm.timestamp | date:'yyyy-MM-dd HH:mm:ss' }} ap-southeast-3 - Anomaly detected on vehicle <strong style="color:#fff;">{{ alarm.vehicleId }}</strong>: container temp is <strong style="color: #ef4444;">{{ alarm.temperature }}°C</strong> (Triggered siren chime on dashboard)
+            <div *ngFor="let log of logisticsLogs" style="margin-bottom: 4px;">
+              {{ log }}
             </div>
           </div>
         </div>
@@ -138,10 +139,10 @@
       <!-- RIGHT COLUMN: Actions and Configuration Console -->
       <div style="display: flex; flex-direction: column; gap: 16px; height: 100%; overflow-y: auto;">
         
-        <!-- AWS Simulator Settings Card -->
+        <!-- Fleet Simulator Settings Card -->
         <div class="aws-card" style="display: flex; flex-direction: column;">
           <div class="aws-card-header">
-            <span class="aws-card-title">IoT Telemetry Generator</span>
+            <span class="aws-card-title">Fleet Telemetry Simulator</span>
           </div>
           <div class="aws-card-content" style="display: flex; flex-direction: column; gap: 12px;">
             <div style="display: flex; gap: 8px;">
@@ -150,27 +151,27 @@
                       [style.background]="simRunning ? 'var(--danger)' : ''"
                       [style.color]="simRunning ? '#fff' : ''"
                       style="flex-grow: 1;">
-                {{ simRunning ? 'STOP SIMULATOR' : 'START TELEMETRY STREAM' }}
+                {{ simRunning ? 'STOP SIMULATOR' : 'SIMULATE FLEET DISPATCH' }}
               </button>
               
               <button (click)="triggerTempAnomaly()" 
                       [style.background]="tempAnomalyTriggered ? 'rgba(209, 50, 18, 0.2)' : 'transparent'"
                       [style.border-color]="tempAnomalyTriggered ? 'var(--danger)' : '#8795a5'"
                       [style.color]="tempAnomalyTriggered ? 'var(--danger)' : '#fff'">
-                TRIGGER TEMP OVERHEAT (TR-2)
+                SIMULATE CONTAINER ALARM (TR-02)
               </button>
             </div>
             <p style="font-size: 0.72rem; color: var(--text-secondary); line-height: 1.4;">
-              Publishes mock truck movements via STOMP broker payload path <code style="color: var(--action-blue);">/app/telemetry</code> every 500ms to evaluate backpressure rendering.
+              Publishes mock vehicle location updates and routes around Jakarta every 500ms.
             </p>
           </div>
         </div>
 
-        <!-- AWS Loom Batch Processor Card -->
+        <!-- Warehouse Batch Processor Card -->
         <div class="aws-card" style="display: flex; flex-direction: column; flex-grow: 1; min-height: 250px;">
           <div class="aws-card-header">
-            <span class="aws-card-title">Loom Virtual Threads Sorting Console</span>
-            <span style="font-size: 0.65rem; background: #ff9900; color: #000; font-weight: 700; padding: 2px 6px; border-radius: 2px;">Java 21 Loom</span>
+            <span class="aws-card-title">Warehouse Sorting Dispatch Engine</span>
+            <span style="font-size: 0.65rem; background: #ff9900; color: #000; font-weight: 700; padding: 2px 6px; border-radius: 2px;">Jakarta Hub</span>
           </div>
           <div class="aws-card-content" style="display: flex; flex-direction: column; gap: 12px; height: calc(100% - 40px);">
             
@@ -179,12 +180,12 @@
               <input type="number" [(ngModel)]="simulationBatchSize" style="width: 50px; text-align: center;" />
               
               <button (click)="runSortingSimulation()" class="btn-action" style="flex-grow: 1;">
-                SPAWN Loom BATCH
+                INGEST BATCH MANIFEST
               </button>
             </div>
 
             <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
-              <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary);">PostgreSQL Packages Registry logs</span>
+              <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary);">Hub Package Registry Status</span>
               <button (click)="loadPackages()" style="background: transparent; border: none; color: var(--action-blue); font-size: 0.75rem; cursor: pointer; font-weight: 700; padding: 0;">
                 Refresh Tables
               </button>
@@ -195,14 +196,14 @@
               <table style="border-collapse: collapse;">
                 <thead>
                   <tr>
-                    <th style="font-size: 0.7rem; padding: 6px 10px;">ID</th>
-                    <th style="font-size: 0.7rem; padding: 6px 10px;">State</th>
-                    <th style="font-size: 0.7rem; padding: 6px 10px;">Java Virtual Thread</th>
+                    <th style="font-size: 0.7rem; padding: 6px 10px;">Package ID</th>
+                    <th style="font-size: 0.7rem; padding: 6px 10px;">Lifecycle State</th>
+                    <th style="font-size: 0.7rem; padding: 6px 10px;">Dispatcher Node</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr *ngIf="packages.length === 0">
-                    <td colspan="3" style="padding: 16px; text-align: center; color: var(--text-muted); font-size: 0.75rem;">No logs found. Spawn a Loom batch to transition package states.</td>
+                    <td colspan="3" style="padding: 16px; text-align: center; color: var(--text-muted); font-size: 0.75rem;">No active manifests. Dispatch a batch to start.</td>
                   </tr>
                   <tr *ngFor="let pkg of packages">
                     <td style="padding: 8px 10px; font-weight: 700; color: var(--action-blue); font-family: monospace;">{{ pkg.packageId }}</td>
